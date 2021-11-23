@@ -9,7 +9,11 @@ class App extends Component {
     }
 
     callAPI() {
-        fetch("http://localhost:9000/testAPI")
+        var data = {
+            "classID": 1234
+        }
+        var queryString = Object.keys(data).map(key => key + '=' + data[key]).join('&');
+        fetch("http://localhost:9000/testAPI?" + queryString, {})
             .then(res => res.text())
             .then(res => this.setState({ apiResponse: res }))
             .catch(err => err);
