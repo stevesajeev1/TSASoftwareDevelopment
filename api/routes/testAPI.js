@@ -30,7 +30,7 @@ router.get("/", async function(req, res, next) {
     if (classSnapshot.exists()) {
         const classData = classSnapshot.data();
         data.name = classData.name;
-        const weeksRef = fb.collection(classRef, `weeks`);
+        const weeksRef = fb.collection(classRef, "weeks");
         const docs = await fb.getDocs(weeksRef);
         docs.forEach(doc => {
             data.weeks.push(

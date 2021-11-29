@@ -1,8 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+import Container from './components/Container.js';
 import registerServiceWorker from './registerServiceWorker';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(
+    <React.StrictMode>
+        <Container />
+    </React.StrictMode>, 
+    document.getElementById('root')
+);
 registerServiceWorker();
