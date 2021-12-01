@@ -44,4 +44,28 @@ router.get("/", async function(req, res, next) {
     res.send(JSON.stringify(data));
 });
 
+router.get("/classID/", async function(req, res, next) {
+    res.header("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.header("Pragma", "no-cache");
+    res.header("Expires", 0);
+
+    var data = {
+        students: []
+    };
+
+    const classRef = fb.doc(firestore, `classes/${req.query.classID}`);
+    const classSnapshot = await fb.getDoc(classRef);
+    if (classSnapshot.exists()) {
+        const weeksRef = fb.collection(classRef, "weeks");
+        const docs = await fb.getDocs(weeksRef);
+        const lastDoc = docs.docs[0];
+        Object.keys(lastDoc.data().students).forEach(student => {
+            data.students.push(student);
+        })
+        res.status(200).send(JSON.stringify(data));
+    } else {
+        res.sendStatus(404);
+    }
+});
+
 module.exports = router;
