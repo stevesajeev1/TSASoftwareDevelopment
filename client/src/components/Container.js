@@ -3,7 +3,8 @@ import Class from "./Class.js"
 
 class Container extends React.Component {
     state = {
-        classID: "null"
+        classID: "null",
+        finalID: true
     }
 
     setUpdate = (updatedClassID) => {
@@ -11,10 +12,16 @@ class Container extends React.Component {
             classID: updatedClassID
         });
     }
+
+    setFinal = (state) => {
+        this.setState({
+            finalID: state
+        })
+    }
     
     render() {
         return (
-            <Class classID={this.state.classID} setUpdate={this.setUpdate} />
+            <Class classID={this.state.classID} setUpdate={this.setUpdate} final={this.state.finalID} setFinal={this.setFinal} />
         )
     }
 }

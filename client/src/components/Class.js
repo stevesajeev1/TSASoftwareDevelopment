@@ -7,7 +7,12 @@ class Class extends React.Component {
         editing: false,
         temp: "null",
         students: [],
-        error: false
+        iDError: false,
+        createIDError: false,
+        createNameError: false,
+        newID: null,
+        newName: "",
+        successfulCreation: false
     }
 
     handleEditing = () => {
@@ -15,11 +20,12 @@ class Class extends React.Component {
             editing: true,
             temp: this.props.classID
         })
+        this.props.setFinal(false);
     }
 
-    callAPIClassID() {
+    callAPIClassID(classID) {
         var data = {
-            "classID": this.props.classID
+            "classID": classID
         }
         var queryString = Object.keys(data).map(key => key + '=' + data[key]).join('&');
         return fetch("http://localhost:9000/testAPI/classID?" + queryString, {})
@@ -27,19 +33,37 @@ class Class extends React.Component {
             .catch(err => err);
     }
 
-    showError() {
-        this.setState({
-            error: true
-        });
+    callAPICreate(classID, className) {
+        var data = {
+            "classID": classID,
+            "className": className
+        }
+        var queryString = Object.keys(data).map(key => key + '=' + data[key]).join('&');
+        fetch("http://localhost:9000/testAPI/create?" + queryString, {})
+            .then(res => {return res})
+            .catch(err => err);
+    }
+
+    showError(id) {
+        if (id) {
+            this.setState({
+                idError: true
+            });
+        } else {
+            this.setState({
+                createIDError: true
+            });
+        }
     }
 
     handleUpdatedDone = async event => {
         if (event.key === "Enter") {
-            const studentResponse = await this.callAPIClassID();
+            const studentResponse = await this.callAPIClassID(this.props.classID);
             if (studentResponse.status == 404) {
-                this.showError();
+                this.showError(true);
             } else {
                 const studentsPromise = await studentResponse.json();
+                this.props.setFinal(true);
                 this.setState({
                     students: studentsPromise.students,
                     editing: false
@@ -48,11 +72,34 @@ class Class extends React.Component {
         }
     }
 
+    handleCreate = async event => {
+        if (event.key === "Enter") {
+            const studentResponse = await this.callAPIClassID(this.state.newID);
+            if (studentResponse.status != 404) {
+                this.showError(false);
+                return;
+            } else if (this.state.newName.length == 0) {
+                this.setState({
+                    createNameError: true
+                });
+                return;
+            } else {
+                await this.callAPICreate(this.state.newID, this.state.newName);
+                this.setState({
+                    successfulCreation: true
+                })
+            }
+        }
+    }
+
     render() {
         let viewMode = {}
         let editMode = {}
-        let error = {}
+        let idError = {}
         let students = {}
+        let createIDError = {}
+        let createNameError = {}
+        let successfulCreation = {}
 
         if (this.state.editing) {
             viewMode.display = "none";
@@ -60,20 +107,56 @@ class Class extends React.Component {
             editMode.display = "none";
         }
 
-        if (this.state.error) {
+        if (this.state.idError) {
             var obj = this;
             var hide = setTimeout(function() {
                 obj.setState({
-                    error: false
+                    idError: false
                 })
                 clearInterval(hide);
             }, 2000);
         } else {
-            error.display = "none";
+            idError.display = "none";
         }
 
-        if (!this.state.students.length) {
-            students.display = "none";
+        if (this.state.createIDError) {
+            var obj = this;
+            var hide = setTimeout(function() {
+                obj.setState({
+                    createIDError: false
+                })
+                clearInterval(hide);
+            }, 2000);
+        } else {
+            createIDError.display = "none";
+        }
+
+        if (this.state.createNameError) {
+            var obj = this;
+            var hide = setTimeout(function() {
+                obj.setState({
+                    createIDError: false
+                })
+                clearInterval(hide);
+            }, 2000);
+        } else {
+            createNameError.display = "none";
+        }
+
+        if (this.state.successfulCreation) {
+            var obj = this;
+            var hide = setTimeout(function() {
+                obj.setState({
+                    successfulCreation: false
+                })
+                clearInterval(hide);
+            }, 4000);
+        } else {
+            successfulCreation.display = "none";
+        }
+
+        if (this.props.classID == "null" || !this.props.final) {
+            students.visibility = "hidden";
         }
 
       return (
@@ -91,12 +174,17 @@ class Class extends React.Component {
                         style={editMode} 
                         className="textInput" 
                         placeholder={this.state.temp} 
+                        onInput={e => {
+                            if (e.target.value.length > 5) {
+                                e.target.value = e.target.value.slice(0, 5);
+                            }
+                        }}
                         onChange={e => {
                             this.props.setUpdate(e.target.value);
                         }}
                         onKeyDown={this.handleUpdatedDone}
                     />
-                    <div style={error} className="grid justify-items-center text-thin my-0 mx-2 error">
+                    <div style={idError} className="grid justify-items-center text-thin my-0 mx-2 error">
                         {this.props.classID} is not a valid class ID!
                     </div>
                     <div className="grid justify-items-center text-thin mb-2 mx-2">
@@ -111,6 +199,57 @@ class Class extends React.Component {
                             <li className="text-thin px-4">{student}</li>
                         ))}
                     </ul>
+                    <hr style={{border: "solid 3px rgb(209, 213, 219)"}}></hr>
+                    <div className="grid justify-items-center create my-2 mx-2">
+                        Create Class ID
+                    </div>
+                    <div className="mx-2 text-med">
+                        ID:
+                    </div>
+                    <input 
+                        type="text" 
+                        className="textInput" 
+                        placeholder="Enter Class ID:" 
+                        onInput={e => {
+                            if (e.target.value.length > 5) {
+                                e.target.value = e.target.value.slice(0, 5);
+                            }
+                        }}
+                        onChange={e => {
+                            this.setState({
+                                newID: e.target.value
+                            })
+                        }}
+                        onKeyDown={this.handleCreate}
+                    />
+                    <div style={createIDError} className="grid justify-items-center text-thin my-0 mx-2 error">
+                        {this.state.newID} is an invalid/already in use class ID!
+                    </div>
+                    <div className="mx-2 text-med">
+                        Class Name:
+                    </div>
+                    <input 
+                        type="text" 
+                        className="textInput" 
+                        placeholder="Enter Class Name:" 
+                        onInput={e => {
+                            if (e.target.value.length > 20) {
+                                e.target.value = e.target.value.slice(0, 20);
+                            }
+                        }}
+                        onChange={e => {
+                            this.setState({
+                                newName: e.target.value
+                            })
+                        }}
+                        onKeyDown={this.handleCreate}
+                    />
+                    <div style={createNameError} className="grid justify-items-center text-thin my-0 mx-2 error">
+                        Provide a class name!
+                    </div>
+                    <div style={successfulCreation} className="grid justify-items-center text-success text-center my-2 mx-2">
+                        New class created with ID: {this.state.newID} titled: {this.state.newName}
+                    </div>
                 </div>
             </div>
         </div>

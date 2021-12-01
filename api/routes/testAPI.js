@@ -58,14 +58,31 @@ router.get("/classID/", async function(req, res, next) {
     if (classSnapshot.exists()) {
         const weeksRef = fb.collection(classRef, "weeks");
         const docs = await fb.getDocs(weeksRef);
-        const lastDoc = docs.docs[0];
-        Object.keys(lastDoc.data().students).forEach(student => {
-            data.students.push(student);
-        })
+        if (!docs.empty) {
+            const lastDoc = docs.docs[0];
+            if (lastDoc.exists()) {
+                Object.keys(lastDoc.data().students).forEach(student => {
+                    data.students.push(student);
+                })
+            }
+        }
         res.status(200).send(JSON.stringify(data));
     } else {
         res.sendStatus(404);
     }
+});
+
+router.get("/create/", async function(req, res, next) {
+    res.header("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.header("Pragma", "no-cache");
+    res.header("Expires", 0);
+
+    const classRef = fb.doc(firestore, `classes/${req.query.classID}`);
+    await fb.setDoc(classRef, {
+            name: req.query.className
+        }
+    ).catch(err => res.sendStatus(404));
+    res.sendStatus(200);
 });
 
 module.exports = router;
