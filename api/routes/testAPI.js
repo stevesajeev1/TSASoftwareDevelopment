@@ -22,7 +22,8 @@ router.get("/", async function(req, res, next) {
 
     var data = {
         name: "",
-        weeks: []
+        weeks: [],
+        students: []
     };
 
     const classRef = fb.doc(firestore, `classes/${req.query.classID}`);
@@ -32,33 +33,15 @@ router.get("/", async function(req, res, next) {
         data.name = classData.name;
         const weeksRef = fb.collection(classRef, "weeks");
         const docs = await fb.getDocs(weeksRef);
-        docs.forEach(doc => {
-            data.weeks.push(
-                {
-                    week: doc.id,
-                    students: doc.data().students
-                }
-            )
-        });
-    }
-    res.send(JSON.stringify(data));
-});
-
-router.get("/classID/", async function(req, res, next) {
-    res.header("Cache-Control", "no-cache, no-store, must-revalidate");
-    res.header("Pragma", "no-cache");
-    res.header("Expires", 0);
-
-    var data = {
-        students: []
-    };
-
-    const classRef = fb.doc(firestore, `classes/${req.query.classID}`);
-    const classSnapshot = await fb.getDoc(classRef);
-    if (classSnapshot.exists()) {
-        const weeksRef = fb.collection(classRef, "weeks");
-        const docs = await fb.getDocs(weeksRef);
         if (!docs.empty) {
+            docs.forEach(doc => {
+                data.weeks.push(
+                    {
+                        week: doc.id,
+                        students: doc.data().students
+                    }
+                )
+            });
             const lastDoc = docs.docs[0];
             if (lastDoc.exists()) {
                 Object.keys(lastDoc.data().students).forEach(student => {

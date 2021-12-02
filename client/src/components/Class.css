@@ -41,10 +41,10 @@
     overflow-y: auto;
     overflow-x: hidden;
 }
-.container {
+.classDiv {
     display: flex;
     flex-direction: column;
-    width: 250px;
+    width: 19%;
     height: 100%;
 }
 .create {

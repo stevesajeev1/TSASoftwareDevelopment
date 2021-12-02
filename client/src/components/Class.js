@@ -28,8 +28,7 @@ class Class extends React.Component {
             "classID": classID
         }
         var queryString = Object.keys(data).map(key => key + '=' + data[key]).join('&');
-        return fetch("http://localhost:9000/testAPI/classID?" + queryString, {})
-            .then(res => {return res})
+        return fetch("http://localhost:9000/testAPI?" + queryString, {})
             .catch(err => err);
     }
 
@@ -39,8 +38,7 @@ class Class extends React.Component {
             "className": className
         }
         var queryString = Object.keys(data).map(key => key + '=' + data[key]).join('&');
-        fetch("http://localhost:9000/testAPI/create?" + queryString, {})
-            .then(res => {return res})
+        return fetch("http://localhost:9000/testAPI/create?" + queryString, {})
             .catch(err => err);
     }
 
@@ -64,6 +62,7 @@ class Class extends React.Component {
             } else {
                 const studentsPromise = await studentResponse.json();
                 this.props.setFinal(true);
+                this.props.setData(studentsPromise.name, studentsPromise.students, studentsPromise.weeks);
                 this.setState({
                     students: studentsPromise.students,
                     editing: false
@@ -162,7 +161,7 @@ class Class extends React.Component {
       return (
         <div>
             <div className="pb-6">
-                <div className="absolute top-0 right-0 bg-gray-100 border-4 border-indigo-600 rounded-bl-lg container">
+                <div className="absolute top-0 right-0 bg-gray-100 border-4 border-indigo-600 rounded-bl-lg classDiv">
                     <div className="grid justify-items-center text-bold mt-2 mx-2">
                         Class ID
                     </div>
@@ -203,49 +202,53 @@ class Class extends React.Component {
                     <div className="grid justify-items-center create my-2 mx-2">
                         Create Class ID
                     </div>
-                    <div className="mx-2 text-med">
-                        ID:
+                    <div className="pl-4 pr-2 pb-2">
+                        <div className="text-med">
+                            ID:
+                        </div>
+                        <input 
+                            type="text" 
+                            className="textInput" 
+                            placeholder="Enter Class ID:" 
+                            onInput={e => {
+                                if (e.target.value.length > 5) {
+                                    e.target.value = e.target.value.slice(0, 5);
+                                }
+                            }}
+                            onChange={e => {
+                                this.setState({
+                                    newID: e.target.value
+                                })
+                            }}
+                            onKeyDown={this.handleCreate}
+                        />
+                        <div style={createIDError} className="grid justify-items-center text-thin my-0 mx-2 error">
+                            {this.state.newID} is an invalid/already in use class ID!
+                        </div>
                     </div>
-                    <input 
-                        type="text" 
-                        className="textInput" 
-                        placeholder="Enter Class ID:" 
-                        onInput={e => {
-                            if (e.target.value.length > 5) {
-                                e.target.value = e.target.value.slice(0, 5);
-                            }
-                        }}
-                        onChange={e => {
-                            this.setState({
-                                newID: e.target.value
-                            })
-                        }}
-                        onKeyDown={this.handleCreate}
-                    />
-                    <div style={createIDError} className="grid justify-items-center text-thin my-0 mx-2 error">
-                        {this.state.newID} is an invalid/already in use class ID!
-                    </div>
-                    <div className="mx-2 text-med">
-                        Class Name:
-                    </div>
-                    <input 
-                        type="text" 
-                        className="textInput" 
-                        placeholder="Enter Class Name:" 
-                        onInput={e => {
-                            if (e.target.value.length > 20) {
-                                e.target.value = e.target.value.slice(0, 20);
-                            }
-                        }}
-                        onChange={e => {
-                            this.setState({
-                                newName: e.target.value
-                            })
-                        }}
-                        onKeyDown={this.handleCreate}
-                    />
-                    <div style={createNameError} className="grid justify-items-center text-thin my-0 mx-2 error">
-                        Provide a class name!
+                    <div className="pl-4 pr-2">
+                        <div className="text-med">
+                            Class Name:
+                        </div>
+                        <input 
+                            type="text" 
+                            className="textInput" 
+                            placeholder="Enter Class Name:" 
+                            onInput={e => {
+                                if (e.target.value.length > 20) {
+                                    e.target.value = e.target.value.slice(0, 20);
+                                }
+                            }}
+                            onChange={e => {
+                                this.setState({
+                                    newName: e.target.value
+                                })
+                            }}
+                            onKeyDown={this.handleCreate}
+                        />
+                        <div style={createNameError} className="grid justify-items-center text-thin my-0 mx-2 error">
+                            Provide a class name!
+                        </div>
                     </div>
                     <div style={successfulCreation} className="grid justify-items-center text-success text-center my-2 mx-2">
                         New class created with ID: {this.state.newID} titled: {this.state.newName}

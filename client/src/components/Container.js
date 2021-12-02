@@ -1,10 +1,14 @@
 import React from "react";
-import Class from "./Class.js"
+import Class from "./Class.js";
+import Content from "./Content.js";
 
 class Container extends React.Component {
     state = {
         classID: "null",
-        finalID: true
+        finalID: true,
+        name: "",
+        students: [],
+        weeks: []
     }
 
     setUpdate = (updatedClassID) => {
@@ -13,15 +17,26 @@ class Container extends React.Component {
         });
     }
 
-    setFinal = (state) => {
+    setFinal = (final) => {
         this.setState({
-            finalID: state
+            finalID: final
+        })
+    }
+
+    setData = (name, students, weeks) => {
+        this.setState({
+            name: name,
+            students: students,
+            weeks: weeks
         })
     }
     
     render() {
         return (
-            <Class classID={this.state.classID} setUpdate={this.setUpdate} final={this.state.finalID} setFinal={this.setFinal} />
+            <div>
+                <Class classID={this.state.classID} setUpdate={this.setUpdate} final={this.state.finalID} setFinal={this.setFinal} setData={this.setData} />
+                <Content classID={this.state.classID} final={this.state.finalID} name={this.state.name} weeks={this.state.weeks}/>
+            </div>
         )
     }
 }

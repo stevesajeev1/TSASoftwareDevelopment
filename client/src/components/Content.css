@@ -1,0 +1,16 @@
+.content {
+    display: flex;
+    flex-direction: column;
+    width: 82%;
+    height: 100%;
+}
+.header {
+    font-family: 'Inter';
+    font-weight: 650;
+    font-size: 60px;
+}
+.weeks {
+    font-family: 'Inter';
+    font-weight: 400;
+    font-size: 45px;
+}
