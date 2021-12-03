@@ -62,7 +62,7 @@ class Class extends React.Component {
             } else {
                 const studentsPromise = await studentResponse.json();
                 this.props.setFinal(true);
-                this.props.setData(studentsPromise.name, studentsPromise.students, studentsPromise.weeks);
+                this.props.setData(studentsPromise.name, studentsPromise.students, studentsPromise.weeks, studentsPromise.teacher);
                 this.setState({
                     students: studentsPromise.students,
                     editing: false
@@ -194,8 +194,8 @@ class Class extends React.Component {
                         Students
                     </div>
                     <ul style={students} className="studentsList divide-y-4">
-                        {this.state.students.map(student => (
-                            <li className="text-thin px-4">{student}</li>
+                        {this.state.students.map((student, i) => (
+                            <li key={i} className="text-thin px-4">{student}</li>
                         ))}
                     </ul>
                     <hr style={{border: "solid 3px rgb(209, 213, 219)"}}></hr>

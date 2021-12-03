@@ -9,8 +9,17 @@
     font-weight: 650;
     font-size: 60px;
 }
+.teacher {
+    font-family: 'Inter';
+    font-weight: 350;
+    font-size: 35px;
+}
 .weeks {
     font-family: 'Inter';
     font-weight: 400;
     font-size: 45px;
+}
+.dropdownContainer {
+    max-height: 350px;
+    overflow-y: auto;
 }

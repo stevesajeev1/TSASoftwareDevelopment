@@ -7,6 +7,7 @@ class Container extends React.Component {
         classID: "null",
         finalID: true,
         name: "",
+        teacher: "",
         students: [],
         weeks: []
     }
@@ -23,11 +24,12 @@ class Container extends React.Component {
         })
     }
 
-    setData = (name, students, weeks) => {
+    setData = (name, students, weeks, teacher) => {
         this.setState({
             name: name,
             students: students,
-            weeks: weeks
+            weeks: weeks,
+            teacher: teacher
         })
     }
     
@@ -35,7 +37,7 @@ class Container extends React.Component {
         return (
             <div>
                 <Class classID={this.state.classID} setUpdate={this.setUpdate} final={this.state.finalID} setFinal={this.setFinal} setData={this.setData} />
-                <Content classID={this.state.classID} final={this.state.finalID} name={this.state.name} weeks={this.state.weeks}/>
+                <Content classID={this.state.classID} final={this.state.finalID} name={this.state.name} weeks={this.state.weeks} teacher={this.state.teacher}/>
             </div>
         )
     }

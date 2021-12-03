@@ -22,6 +22,7 @@ router.get("/", async function(req, res, next) {
 
     var data = {
         name: "",
+        teacher: "",
         weeks: [],
         students: []
     };
@@ -31,6 +32,7 @@ router.get("/", async function(req, res, next) {
     if (classSnapshot.exists()) {
         const classData = classSnapshot.data();
         data.name = classData.name;
+        data.teacher = classData.teacher;
         const weeksRef = fb.collection(classRef, "weeks");
         const docs = await fb.getDocs(weeksRef);
         if (!docs.empty) {
@@ -42,7 +44,7 @@ router.get("/", async function(req, res, next) {
                     }
                 )
             });
-            const lastDoc = docs.docs[0];
+            const lastDoc = docs.docs[docs.docs.length - 1];
             if (lastDoc.exists()) {
                 Object.keys(lastDoc.data().students).forEach(student => {
                     data.students.push(student);
